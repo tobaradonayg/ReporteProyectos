@@ -53,6 +53,8 @@ td.monto{font-weight:800;color:var(--navy);white-space:nowrap}
 .btn-mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px}
 .btn-mini:hover{background:#f1f5f9}
 .btn-mini.peligro:hover{background:#fee2e2;border-color:#fca5a5}
+.col-obs{max-width:280px;min-width:150px}
+.obs-line{font-size:11.5px;color:#475569;line-height:1.4;display:inline-block}
 .mat-lista{display:none}
 .mat-line{font-size:11.5px;color:#334155}
 .fila-detalle td{background:#f8fafc;padding:12px 16px}
@@ -90,26 +92,30 @@ textarea.inp{resize:vertical;min-height:64px}
 #toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
 #printHeader{display:none}
 @media print{
-  @page{size:letter landscape;margin:8mm}
+  @page{size:letter landscape;margin:6mm 4mm}
   header,.toolbar,.no-print,#barraInfo,#toast{display:none!important}
   body{background:#fff}
   main{padding:0}
+  .tabla-scroll{overflow:visible!important}
   #printHeader{display:block;border-bottom:2px solid #0f2a43;padding-bottom:6px;margin-bottom:8px}
-  #printHeader h1{margin:0;font-size:14px;color:#0f2a43}
-  #printHeader .meta{font-size:9.5px;color:#334155;margin-top:2px}
-  .grupo{box-shadow:none;border:1px solid #cbd5e1;margin-bottom:8px}
+  #printHeader h1{margin:0;font-size:17px;color:#0f2a43}
+  #printHeader .meta{font-size:11px;color:#334155;margin-top:2px}
+  .grupo{box-shadow:none;border:1px solid #cbd5e1;margin-bottom:9px}
   .grupo.cerrado .grupo-body{display:block!important}
-  .grupo-head{padding:4px 10px;font-size:11.5px;page-break-after:avoid;break-after:avoid}
-  .grupo-head .gh-total{font-size:10.5px;padding:1px 8px}
-  .grupo-head .gh-n{font-size:10px}
-  th,td{padding:2.5px 6px;font-size:9.5px}
-  th{font-size:8px;padding:3px 6px}
-  .mini-txt{font-size:8.5px;margin-top:1px}
-  .compra-nombre{font-size:9px;padding:1px 5px}
-  .monto{font-size:10px}
+  .grupo-head{padding:5px 10px;font-size:13.5px;page-break-after:avoid;break-after:avoid}
+  .grupo-head .gh-total{font-size:12px;padding:1px 9px}
+  .grupo-head .gh-n{font-size:11.5px}
+  th,td{padding:4px 8px;font-size:11.5px}
+  th{font-size:9.5px;padding:4px 8px}
+  .mini-txt{font-size:10.5px;margin-top:1px}
+  .compra-nombre{font-size:11px;padding:1px 6px}
+  .monto{font-size:12.5px}
+  .badge{font-size:10px;padding:1px 8px}
   .mat-resumen{display:none!important}
   .mat-lista{display:block!important}
-  .mat-line{font-size:9px;line-height:1.35}
+  .mat-line{font-size:11px;line-height:1.45}
+  .col-obs{max-width:none!important;min-width:0!important}
+  .obs-line{font-size:11px;line-height:1.4;color:#0f172a}
   .fila-detalle{display:none!important}
   .col-print-hide{display:none!important}
   tr{page-break-inside:avoid}
@@ -305,7 +311,7 @@ function render(){
         <div><span class="gh-n">${items.length} proyecto${items.length>1?'s':''}</span><span class="gh-total">${fmt(sub)}</span></div>
       </div>
       <div class="grupo-body"><div class="tabla-scroll"><table>
-        <thead><tr><th>ID</th><th>Proyecto</th><th class="col-print-hide">Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th>Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="col-print-hide no-print">Acciones</th></tr></thead>
+        <thead><tr><th>ID</th><th>Proyecto</th><th class="col-print-hide">Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th>Materiales</th><th class="col-obs">📝 Importante / Observaciones</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="col-print-hide no-print">Acciones</th></tr></thead>
         <tbody>${items.map(filaProyecto).join('')}</tbody>
       </table></div></div></section>`;
   }
@@ -324,6 +330,7 @@ function filaProyecto(p){
       <span class="mat-resumen">${mats.length?mats.length+' mat. · '+fmt(suma):'—'}</span>
       <span class="mat-lista">${mats.length?mats.map(m=>`<div class="mat-line">• ${esc(matLinea(m))}</div>`).join(''):'—'}</span>
     </td>
+    <td class="col-obs">${p.observaciones?`<span class="obs-line">📝 ${esc(p.observaciones)}</span>`:'<span class="tenue">—</span>'}</td>
     <td class="monto">${fmt(p.monto)}</td>
     <td>${fEs(p.fechaContacto)||'—'}</td>
     <td class="acciones no-print col-print-hide">
@@ -332,7 +339,7 @@ function filaProyecto(p){
       <button class="btn-mini peligro" data-action="borrar" data-id="${esc(p.id)}" title="Eliminar">🗑</button>
     </td>
   </tr>
-  <tr class="fila-detalle" id="det-${esc(p.id)}" style="display:none"><td colspan="9">${detalleHTML(p)}</td></tr>`;
+  <tr class="fila-detalle" id="det-${esc(p.id)}" style="display:none"><td colspan="10">${detalleHTML(p)}</td></tr>`;
 }
 
 /* Detalle: SOLO visible en pantalla con el botón 👁 (no se imprime) */
