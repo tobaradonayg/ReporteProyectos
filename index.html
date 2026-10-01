@@ -53,12 +53,17 @@ td.monto{font-weight:800;color:var(--navy);white-space:nowrap}
 .btn-mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px}
 .btn-mini:hover{background:#f1f5f9}
 .btn-mini.peligro:hover{background:#fee2e2;border-color:#fca5a5}
-.fila-detalle td{background:#f8fafc;padding:16px 20px}
-.det-titulo{font-size:11px;text-transform:uppercase;font-weight:800;color:var(--muted);letter-spacing:.5px;margin:0 0 10px}
-.det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px;margin-bottom:14px}
-.det-grid .k{font-size:10.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
-.det-grid .v{font-size:13.5px;margin-top:2px}
-.mat-table th{background:#eef2f7}
+.fila-detalle td{background:#f8fafc;padding:12px 16px}
+.det-strip{display:flex;gap:8px 28px;flex-wrap:wrap;margin-bottom:8px}
+.det-item .k{display:block;font-size:10px;text-transform:uppercase;font-weight:800;letter-spacing:.4px;color:var(--muted)}
+.det-item .v{font-size:13px;margin-top:1px}
+.det-obs{background:#fff;border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:8px;padding:7px 12px;margin-bottom:10px;max-width:900px}
+.det-obs .k{font-size:10px;text-transform:uppercase;font-weight:800;color:var(--muted);letter-spacing:.4px}
+.det-obs .v{font-size:12.5px;margin-top:2px}
+.mat-table{font-size:12px}
+.mat-table th{background:#eef2f7;padding:5px 8px;font-size:10px}
+.mat-table td{padding:4px 8px}
+.mat-table .celda-sub{white-space:nowrap;font-weight:700;color:var(--navy)}
 .vacio{text-align:center;padding:70px 20px;background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(15,42,67,.08)}
 .vacio-icon{font-size:52px}
 .modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:flex-start;justify-content:center;padding:28px 14px;z-index:50;overflow:auto}
@@ -83,18 +88,33 @@ textarea.inp{resize:vertical;min-height:64px}
 #toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
 #printHeader{display:none}
 @media print{
-  @page{size:A4 landscape;margin:11mm}
+  @page{size:A4 landscape;margin:9mm}
   header,.toolbar,.no-print,#barraInfo,#toast{display:none!important}
   body{background:#fff}
   main{padding:0}
-  #printHeader{display:block;border-bottom:3px solid #0f2a43;padding-bottom:10px;margin-bottom:14px}
-  #printHeader h1{margin:0;font-size:18px;color:#0f2a43}
-  #printHeader .meta{font-size:11.5px;color:#334155;margin-top:5px}
-  .grupo{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid-page;margin-bottom:12px}
+  #printHeader{display:block;border-bottom:2px solid #0f2a43;padding-bottom:8px;margin-bottom:10px}
+  #printHeader h1{margin:0;font-size:15px;color:#0f2a43}
+  #printHeader .meta{font-size:10px;color:#334155;margin-top:3px}
+  .grupo{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid-page;margin-bottom:8px}
   .grupo.cerrado .grupo-body{display:block!important}
+  .grupo-head{padding:5px 12px;font-size:12px}
+  .grupo-head .gh-total{font-size:11px;padding:1px 9px}
+  .grupo-head .gh-n{font-size:10.5px}
+  th,td{padding:3px 7px;font-size:10px}
+  th{font-size:8.5px}
+  .badge{font-size:9px;padding:1px 8px}
+  .compra-nombre{font-size:9.5px;padding:1px 6px}
+  .mini-txt{font-size:9px}
   .fila-detalle{display:table-row!important}
-  .fila-detalle td{background:#f8fafc!important}
-  th:nth-child(9),td:nth-child(9){display:none}
+  .fila-detalle td{padding:6px 10px;background:#f8fafc!important}
+  .det-item .k,.det-obs .k{font-size:8px}
+  .det-item .v{font-size:10px}
+  .det-obs{padding:4px 9px;margin-bottom:6px}
+  .det-obs .v{font-size:9.5px}
+  .mat-table{font-size:9.5px}
+  .mat-table th{font-size:8px;padding:2px 6px}
+  .mat-table td{padding:2px 6px}
+  .col-print-hide{display:none!important}
   tr{page-break-inside:avoid}
   thead{display:table-header-group}
 }
@@ -121,7 +141,7 @@ textarea.inp{resize:vertical;min-height:64px}
 <div id="barraInfo"></div>
 
 <div class="toolbar no-print">
-  <input type="search" id="buscador" class="inp" placeholder="🔍 Buscar por proyecto, encargado, dirección, material..." oninput="render()">
+  <input type="search" id="buscador" class="inp" placeholder="🔍 Buscar por proyecto, zona, dirección, encargado, material..." oninput="render()">
   <select id="filtroEstatus" class="inp" onchange="render()">
     <option value="">Todos los estatus</option>
     <option>Cotización</option><option>Autorizado</option><option>En compra</option>
@@ -153,34 +173,33 @@ textarea.inp{resize:vertical;min-height:64px}
       <button type="button" class="btn-x" onclick="mostrarModal(false)">✕</button>
     </div>
     <div class="form-grid">
+      <div class="seccion">📋 Datos del proyecto</div>
       <div class="campo"><label>ID</label><input class="inp" id="f-id" readonly style="background:#f1f5f9;font-weight:700"></div>
-      <div class="campo"><label>Nombre del proyecto *</label><input class="inp" id="f-nombre" required placeholder="Ej. Bodega Los Laureles"></div>
-      <div class="campo"><label>Dirección / Ubicación * (agrupa la tabla)</label><input class="inp" id="f-direccion" required placeholder="Ej. Av. Industrial 245, Tlaquepaque, Jal."></div>
+      <div class="campo"><label>Nombre del proyecto *</label><input class="inp" id="f-nombre" required placeholder="Ej. Res. de Don William"></div>
+
+      <div class="seccion">📍 Ubicación — la dirección GENERAL agrupa los proyectos en la tabla</div>
+      <div class="campo full"><label>Zona / Dirección general *</label><input class="inp" id="f-direccionGeneral" required placeholder="Ej. Quitaná y alrededores"></div>
+      <div class="campo full"><label>Dirección específica de la obra</label><input class="inp" id="f-direccionEspecifica" placeholder="Ej. Calle Jalapa 180, Col. Roma, Guadalajara, Jal."></div>
+
+      <div class="seccion">👥 Personas y compras</div>
+      <div class="campo"><label>Encargado del proyecto</label><input class="inp" id="f-encargado" placeholder="Ej. William"></div>
+      <div class="campo"><label>Teléfono del encargado</label><input class="inp" id="f-telEncargado" placeholder="Ej. 33 1234 5678"></div>
+      <div class="campo"><label>⚠️ La compra sale a NOMBRE DE (empresa o persona) *</label><input class="inp" id="f-compraANombreDe" required placeholder="Ej. A nombre de Don William"></div>
+      <div class="campo"><label>Contacto de compra (tel / correo)</label><input class="inp" id="f-contactoCompra" placeholder="Ej. facturacion@empresa.com"></div>
+
+      <div class="seccion">💰 Monto y seguimiento</div>
       <div class="campo"><label>Estatus</label>
         <select class="inp" id="f-estatus"><option>Cotización</option><option>Autorizado</option><option>En compra</option><option>En camino</option><option>Instalado</option><option>Cerrado</option><option>Pausado</option></select>
       </div>
-
-      <div class="seccion">👥 Personas ligadas al proyecto</div>
-      <div class="campo"><label>Encargado del proyecto</label><input class="inp" id="f-encargado" placeholder="Ej. Ing. Juan Pérez"></div>
-      <div class="campo"><label>Teléfono del encargado</label><input class="inp" id="f-telEncargado" placeholder="Ej. 33 1234 5678"></div>
-      <div class="campo"><label>¿Quién autoriza la compra?</label><input class="inp" id="f-autoriza" placeholder="Ej. María López (administración)"></div>
-      <div class="campo"><label>Contacto de compra (tel / correo)</label><input class="inp" id="f-contactoCompra" placeholder="Ej. facturacion@empresa.com"></div>
-      <div class="campo"><label>⚠️ La compra sale a NOMBRE DE (empresa o persona) *</label><input class="inp" id="f-compraANombreDe" required placeholder="Ej. Constructora XYZ SA de CV"></div>
-      <div class="campo"><label>RFC para facturación (opcional)</label><input class="inp" id="f-rfc" placeholder="Ej. CXY850101XXX"></div>
-      <div class="campo full"><label>¿Quién recibe el material en obra?</label><input class="inp" id="f-recibe" placeholder="Ej. Alberto (almacenista)"></div>
-
-      <div class="seccion">💰 Económico y seguimiento</div>
-      <div class="campo"><label>Monto aproximado del gasto ($)</label><input type="number" step="any" min="0" class="inp" id="f-monto" placeholder="Ej. 185000"></div>
-      <div class="campo"><label>Anticipo / pagos</label><input class="inp" id="f-anticipo" placeholder="Ej. 50% recibido ($92,500)"></div>
-      <div class="campo"><label>Próximo paso</label><input class="inp" id="f-proximoPaso" placeholder="Ej. Confirmar entrega de Galvadeck"></div>
       <div class="campo"><label>Fecha del próximo contacto</label><input type="date" class="inp" id="f-fecha"></div>
-      <div class="campo full"><label>Observaciones importantes (reglas de facturación, acuerdos, etc.)</label><textarea class="inp" id="f-observaciones" placeholder="Ej. La compra SIEMPRE sale a nombre de la empresa aunque el encargado sea otra persona..."></textarea></div>
+      <div class="campo full"><label>Monto aproximado del gasto ($)</label><input type="number" step="any" min="0" class="inp" id="f-monto" placeholder="Ej. 1100"></div>
+      <div class="campo full"><label>📝 Observaciones importantes (acuerdos, reglas de facturación, pagos, trato con el cliente, etc.)</label><textarea class="inp" id="f-observaciones" placeholder="Ej. La compra sale a nombre de Don William..."></textarea></div>
 
       <div class="seccion">🧱 Materiales del proyecto</div>
       <div class="full">
         <div class="tabla-scroll">
           <table class="tab-mat">
-            <thead><tr><th style="width:19%">Material</th><th style="width:10%">Calibre</th><th style="width:12%">Color</th><th style="width:11%">Cantidad</th><th style="width:11%">Unidad</th><th style="width:14%">Precio unit.</th><th style="width:14%">Subtotal</th><th></th></tr></thead>
+            <thead><tr><th style="width:20%">Material</th><th style="width:10%">Calibre</th><th style="width:12%">Color</th><th style="width:11%">Cantidad</th><th style="width:11%">Unidad</th><th style="width:14%">Precio unit.</th><th style="width:14%">Subtotal</th><th></th></tr></thead>
             <tbody id="tbodyMateriales"></tbody>
           </table>
         </div>
@@ -229,7 +248,8 @@ const UNIDADES=['ml','m²','pza','kg','bulto','rollo','lote'];
 const CLASES={'Cotización':'b-cot','Autorizado':'b-aut','En compra':'b-com','En camino':'b-cam','Instalado':'b-ins','Cerrado':'b-cer','Pausado':'b-pau'};
 
 const LS_KEY='proyectosConstruccion_v1', LS_CFG='informeConfig_v1';
-let proyectos=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+/* Migración automática: la "direccion" antigua pasa a ser la Zona (dirección general) */
+let proyectos=(JSON.parse(localStorage.getItem(LS_KEY)||'[]')||[]).map(p=>({...p,direccionGeneral:p.direccionGeneral||p.direccion||'',direccionEspecifica:p.direccionEspecifica||''}));
 let config=JSON.parse(localStorage.getItem(LS_CFG)||'null')||{responsable:'',telefono:'',vacaciones:'',cubre:''};
 let editandoId=null;
 const gruposAbiertos={};
@@ -249,7 +269,7 @@ function render(){
   const fe=$('filtroEstatus').value, ord=$('filtroOrden').value;
   let lista=proyectos.filter(p=>{
     const okE=!fe||p.estatus===fe;
-    const blob=[p.id,p.nombre,p.direccion,p.encargado,p.compraANombreDe,p.autoriza,p.observaciones,p.proximoPaso,(p.materiales||[]).map(m=>m.material).join(' ')].join(' ').toLowerCase();
+    const blob=[p.id,p.nombre,p.direccionGeneral,p.direccionEspecifica,p.encargado,p.compraANombreDe,p.contactoCompra,p.observaciones,(p.materiales||[]).map(m=>m.material).join(' ')].join(' ').toLowerCase();
     return okE&&(!term||blob.includes(term));
   });
   lista.sort({'contacto':(a,b)=>(a.fechaContacto||'9999').localeCompare(b.fechaContacto||'9999'),
@@ -265,21 +285,21 @@ function render(){
   $('printMeta').innerHTML=[config.responsable&&`👤 Responsable: ${esc(config.responsable)}`,config.telefono&&`☎️ ${esc(config.telefono)}`,config.vacaciones&&`📅 Vacaciones: ${esc(config.vacaciones)}`,config.cubre&&`🧑‍💼 Cubre durante ausencia: ${esc(config.cubre)}`].filter(Boolean).join(' &nbsp;·&nbsp; ')+`<br>Resumen: ${lista.length} proyecto(s) · Monto total: ${fmt(total)}`;
 
   const cont=$('contenedorTabla');
-  if(!proyectos.length){cont.innerHTML=`<div class="vacio"><div class="vacio-icon">🏗️</div><h2 style="margin:8px 0 4px">Aún no hay proyectos</h2><p style="color:var(--muted)">Agrega tu primer proyecto o carga datos de ejemplo para ver cómo funciona.</p><div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"><button class="btn" onclick="abrirModalProyecto()">➕ Nuevo proyecto</button><button class="btn" style="background:#0f2a43;color:#fff" onclick="cargarEjemplo()">✨ Cargar datos de ejemplo</button></div></div>`;return}
+  if(!proyectos.length){cont.innerHTML=`<div class="vacio"><div class="vacio-icon">🏗️</div><h2 style="margin:8px 0 4px">Aún no hay proyectos</h2><p style="color:var(--muted)">Agrega tu primer proyecto o carga datos de ejemplo.</p><div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"><button class="btn" onclick="abrirModalProyecto()">➕ Nuevo proyecto</button><button class="btn" style="background:#0f2a43;color:#fff" onclick="cargarEjemplo()">✨ Cargar datos de ejemplo</button></div></div>`;return}
   if(!lista.length){cont.innerHTML=`<div class="vacio"><div class="vacio-icon">🔎</div><h2 style="margin:8px 0">Sin resultados</h2><p style="color:var(--muted)">Prueba con otro filtro o búsqueda.</p></div>`;return}
 
   const grupos={};
-  lista.forEach(p=>{(grupos[(p.direccion||'').trim()||'Sin dirección especificada']??=[]).push(p)});
+  lista.forEach(p=>{const k=(p.direccionGeneral||'').trim()||'Sin zona especificada';(grupos[k]??=[]).push(p)});
   let html='';
-  for(const dir of Object.keys(grupos).sort()){
-    const items=grupos[dir], sub=items.reduce((s,p)=>s+(+p.monto||0),0), abierto=gruposAbiertos[dir]!==false;
-    html+=`<section class="grupo ${abierto?'':'cerrado'}" data-dir="${esc(dir)}">
+  for(const zona of Object.keys(grupos).sort()){
+    const items=grupos[zona], sub=items.reduce((s,p)=>s+(+p.monto||0),0), abierto=gruposAbiertos[zona]!==false;
+    html+=`<section class="grupo ${abierto?'':'cerrado'}" data-dir="${esc(zona)}">
       <div class="grupo-head">
-        <div><span class="chev">${abierto?'▾':'▸'}</span> 📍 <strong>${esc(dir)}</strong></div>
+        <div><span class="chev">${abierto?'▾':'▸'}</span> 📍 <strong>${esc(zona)}</strong></div>
         <div><span class="gh-n">${items.length} proyecto${items.length>1?'s':''}</span><span class="gh-total">${fmt(sub)}</span></div>
       </div>
       <div class="grupo-body"><div class="tabla-scroll"><table>
-        <thead><tr><th>ID</th><th>Proyecto</th><th>Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th>Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="no-print">Acciones</th></tr></thead>
+        <thead><tr><th>ID</th><th>Proyecto</th><th>Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th class="col-print-hide">Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="col-print-hide no-print">Acciones</th></tr></thead>
         <tbody>${items.map(filaProyecto).join('')}</tbody>
       </table></div></div></section>`;
   }
@@ -290,14 +310,14 @@ function filaProyecto(p){
   const mats=p.materiales||[], suma=mats.reduce((s,m)=>s+(+m.subtotal||0),0);
   return `<tr class="fila-pro">
     <td class="id">${esc(p.id)}</td>
-    <td><strong>${esc(p.nombre)}</strong>${p.proximoPaso?`<div class="mini-txt">➜ ${esc(p.proximoPaso)}</div>`:''}</td>
+    <td><strong>${esc(p.nombre)}</strong>${p.direccionEspecifica?`<div class="mini-txt">📌 ${esc(p.direccionEspecifica)}</div>`:''}</td>
     <td><span class="badge ${CLASES[p.estatus]||''}">${esc(p.estatus)}</span></td>
     <td>${p.encargado?esc(p.encargado):'<span class="tenue">—</span>'}${p.telEncargado?`<div class="mini-txt">📞 ${esc(p.telEncargado)}</div>`:''}</td>
-    <td>${p.compraANombreDe?`<span class="compra-nombre">🧾 ${esc(p.compraANombreDe)}</span>${p.autoriza?`<div class="mini-txt">Autoriza: ${esc(p.autoriza)}</div>`:''}`:'<span class="tenue">⚠ sin definir</span>'}</td>
-    <td>${mats.length?mats.length+' mat.<div class="mini-txt">'+fmt(suma)+'</div>':'—'}</td>
+    <td>${p.compraANombreDe?`<span class="compra-nombre">🧾 ${esc(p.compraANombreDe)}</span>`:'<span class="tenue">⚠ sin definir</span>'}</td>
+    <td class="col-print-hide">${mats.length?mats.length+' mat.<div class="mini-txt">'+fmt(suma)+'</div>':'—'}</td>
     <td class="monto">${fmt(p.monto)}</td>
     <td>${fEs(p.fechaContacto)||'—'}</td>
-    <td class="acciones no-print">
+    <td class="acciones no-print col-print-hide">
       <button class="btn-mini" data-action="ver" data-id="${esc(p.id)}" title="Ver detalle">👁</button>
       <button class="btn-mini" data-action="editar" data-id="${esc(p.id)}" title="Editar">✏️</button>
       <button class="btn-mini peligro" data-action="borrar" data-id="${esc(p.id)}" title="Eliminar">🗑</button>
@@ -308,25 +328,17 @@ function filaProyecto(p){
 
 function detalleHTML(p){
   const mats=p.materiales||[];
-  const campo=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v||'<span class="tenue">—</span>'}</div></div>`;
-  return `<p class="det-titulo">📋 Detalle completo · ${esc(p.id)}</p>
-  <div class="det-grid">
-    ${campo('Encargado del proyecto',esc(p.encargado)+((p.telEncargado)?' · 📞 '+esc(p.telEncargado):''))}
-    ${campo('Autoriza la compra',esc(p.autoriza))}
-    ${campo('Contacto de compra',esc(p.contactoCompra))}
-    ${campo('⚠️ Compra a nombre de',`<span class="compra-nombre">${esc(p.compraANombreDe)}</span>`)}
-    ${campo('RFC facturación',esc(p.rfc))}
-    ${campo('Recibe material en obra',esc(p.recibe))}
-    ${campo('Monto aproximado','<strong>'+fmt(p.monto)+'</strong>')}
-    ${campo('Anticipo / pagos',esc(p.anticipo))}
-    ${campo('Próximo paso',esc(p.proximoPaso))}
-    ${campo('Fecha próximo contacto',fEs(p.fechaContacto))}
-    ${campo('Observaciones importantes',esc(p.observaciones))}
+  return `<div class="det-strip">
+    <div class="det-item"><span class="k">🗺️ Zona (dirección general)</span><span class="v">${esc(p.direccionGeneral||'—')}</span></div>
+    <div class="det-item"><span class="k">📌 Dirección específica</span><span class="v">${p.direccionEspecifica?esc(p.direccionEspecifica):'<span class="tenue">—</span>'}</span></div>
+    <div class="det-item"><span class="k">☎️ Contacto de compra</span><span class="v">${p.contactoCompra?esc(p.contactoCompra):'<span class="tenue">—</span>'}</span></div>
+    <div class="det-item"><span class="k">📅 Próximo contacto</span><span class="v">${fEs(p.fechaContacto)||'—'}</span></div>
   </div>
-  ${mats.length?`<p class="det-titulo">🧱 Materiales</p><div class="tabla-scroll"><table class="mat-table">
-    <thead><tr><th>Material</th><th>Calibre</th><th>Color</th><th>Cantidad</th><th>Unidad</th><th>Precio unit.</th><th>Subtotal</th></tr></thead>
-    <tbody>${mats.map(m=>`<tr><td><strong>${esc(m.material)}</strong></td><td>${esc(m.calibre)}</td><td>${esc(m.color)}</td><td>${esc(m.cantidad)}</td><td>${esc(m.unidad)}</td><td>${fmt(m.precio)}</td><td class="celda-sub">${fmt(m.subtotal)}</td></tr>`).join('')}
-    <tr><td colspan="6" style="text-align:right"><strong>Total materiales:</strong></td><td class="celda-sub">${fmt(mats.reduce((s,m)=>s+(+m.subtotal||0),0))}</td></tr></tbody></table></div>`:'<p class="tenue">Sin materiales registrados.</p>'}`;
+  ${p.observaciones?`<div class="det-obs"><span class="k">📝 Observaciones importantes</span><div class="v">${esc(p.observaciones)}</div></div>`:''}
+  ${mats.length?`<div class="tabla-scroll"><table class="mat-table">
+    <thead><tr><th>Material · Calibre · Color</th><th>Cant.</th><th>Und.</th><th>P. unitario</th><th>Subtotal</th></tr></thead>
+    <tbody>${mats.map(m=>`<tr><td><strong>${esc(m.material)}</strong>${m.calibre&&m.calibre!=='N/A'?' · Cal. '+esc(m.calibre):''}${m.color&&m.color!=='N/A'?' · '+esc(m.color):''}</td><td>${esc(m.cantidad)}</td><td>${esc(m.unidad)}</td><td>${fmt(m.precio)}</td><td class="celda-sub">${fmt(m.subtotal)}</td></tr>`).join('')}
+    <tr><td colspan="4" style="text-align:right"><strong>Total materiales:</strong></td><td class="celda-sub">${fmt(mats.reduce((s,m)=>s+(+m.subtotal||0),0))}</td></tr></tbody></table></div>`:'<p class="tenue" style="margin:4px 0">Sin materiales registrados.</p>'}`;
 }
 
 /* ══════════ MATERIALES (formulario) ══════════ */
@@ -378,12 +390,10 @@ function leerMateriales(){
 
 /* ══════════ ALTA / EDICIÓN / BORRADO ══════════ */
 function campos(){return{
-  nombre:$('f-nombre').value.trim(),direccion:$('f-direccion').value.trim(),estatus:$('f-estatus').value,
-  encargado:$('f-encargado').value.trim(),telEncargado:$('f-telEncargado').value.trim(),
-  autoriza:$('f-autoriza').value.trim(),contactoCompra:$('f-contactoCompra').value.trim(),
-  compraANombreDe:$('f-compraANombreDe').value.trim(),rfc:$('f-rfc').value.trim(),recibe:$('f-recibe').value.trim(),
-  monto:parseFloat($('f-monto').value)||0,anticipo:$('f-anticipo').value.trim(),
-  proximoPaso:$('f-proximoPaso').value.trim(),fechaContacto:$('f-fecha').value,observaciones:$('f-observaciones').value.trim()}}
+  nombre:$('f-nombre').value.trim(),direccionGeneral:$('f-direccionGeneral').value.trim(),direccionEspecifica:$('f-direccionEspecifica').value.trim(),
+  estatus:$('f-estatus').value,encargado:$('f-encargado').value.trim(),telEncargado:$('f-telEncargado').value.trim(),
+  compraANombreDe:$('f-compraANombreDe').value.trim(),contactoCompra:$('f-contactoCompra').value.trim(),
+  monto:parseFloat($('f-monto').value)||0,fechaContacto:$('f-fecha').value,observaciones:$('f-observaciones').value.trim()}}
 function abrirModalProyecto(){
   editandoId=null;$('tituloModal').textContent='➕ Nuevo proyecto';$('formProyecto').reset();
   $('f-id').value=siguienteId();$('f-estatus').value='Cotización';
@@ -392,11 +402,10 @@ function abrirModalProyecto(){
 function editarProyecto(id){
   const p=proyectos.find(x=>x.id===id);if(!p)return;
   editandoId=id;$('tituloModal').textContent='✏️ Editar proyecto '+p.id;$('formProyecto').reset();
-  $('f-id').value=p.id;$('f-nombre').value=p.nombre||'';$('f-direccion').value=p.direccion||'';$('f-estatus').value=p.estatus||'Cotización';
-  $('f-encargado').value=p.encargado||'';$('f-telEncargado').value=p.telEncargado||'';$('f-autoriza').value=p.autoriza||'';
-  $('f-contactoCompra').value=p.contactoCompra||'';$('f-compraANombreDe').value=p.compraANombreDe||'';$('f-rfc').value=p.rfc||'';
-  $('f-recibe').value=p.recibe||'';$('f-monto').value=p.monto||'';$('f-anticipo').value=p.anticipo||'';
-  $('f-proximoPaso').value=p.proximoPaso||'';$('f-fecha').value=p.fechaContacto||'';$('f-observaciones').value=p.observaciones||'';
+  $('f-id').value=p.id;$('f-nombre').value=p.nombre||'';$('f-direccionGeneral').value=p.direccionGeneral||'';$('f-direccionEspecifica').value=p.direccionEspecifica||'';
+  $('f-estatus').value=p.estatus||'Cotización';$('f-encargado').value=p.encargado||'';$('f-telEncargado').value=p.telEncargado||'';
+  $('f-compraANombreDe').value=p.compraANombreDe||'';$('f-contactoCompra').value=p.contactoCompra||'';
+  $('f-monto').value=p.monto||'';$('f-fecha').value=p.fechaContacto||'';$('f-observaciones').value=p.observaciones||'';
   $('tbodyMateriales').innerHTML=((p.materiales&&p.materiales.length)?p.materiales:[{}]).map(m=>filaMaterialHTML(m)).join('');
   calcSubtotal();mostrarModal(true);
 }
@@ -443,8 +452,8 @@ function exportarCSV(){
   if(config.responsable)L.push(['Responsable',config.responsable]);
   if(config.vacaciones)L.push(['Vacaciones',config.vacaciones]);
   if(config.cubre)L.push(['Cubre durante ausencia',config.cubre]);
-  L.push([],['ID','Proyecto','Direccion','Estatus','Encargado','Tel. encargado','Autoriza compra','Contacto compra','Compra a nombre de','RFC','Recibe material','Monto aprox','Anticipo/Pagos','Proximo paso','Fecha prox. contacto','Observaciones']);
-  proyectos.forEach(p=>L.push([p.id,p.nombre,p.direccion,p.estatus,p.encargado,p.telEncargado,p.autoriza,p.contactoCompra,p.compraANombreDe,p.rfc,p.recibe,p.monto,p.anticipo,p.proximoPaso,p.fechaContacto,p.observaciones]));
+  L.push([],['ID','Proyecto','Zona (direccion general)','Direccion especifica','Estatus','Encargado','Tel. encargado','Compra a nombre de','Contacto compra','Monto aprox','Fecha prox. contacto','Observaciones']);
+  proyectos.forEach(p=>L.push([p.id,p.nombre,p.direccionGeneral,p.direccionEspecifica,p.estatus,p.encargado,p.telEncargado,p.compraANombreDe,p.contactoCompra,p.monto,p.fechaContacto,p.observaciones]));
   L.push([],['DETALLE DE MATERIALES'],['ID Proyecto','Proyecto','Material','Calibre','Color','Cantidad','Unidad','Precio unitario','Subtotal']);
   proyectos.forEach(p=>(p.materiales||[]).forEach(m=>L.push([p.id,p.nombre,m.material,m.calibre,m.color,m.cantidad,m.unidad,m.precio,m.subtotal??((+m.cantidad||0)*(+m.precio||0))])));
   descargar('informe-proyectos.csv','\uFEFF'+L.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8');
@@ -457,7 +466,8 @@ function importarJSON(ev){
   r.onload=()=>{try{const d=JSON.parse(r.result);
     if(!Array.isArray(d.proyectos))throw 0;
     if(confirm(`Se encontraron ${d.proyectos.length} proyectos.\n¿Reemplazar la información actual?`)){
-      proyectos=d.proyectos;if(d.config)config=d.config;guardar();guardarCfg();aplicarConfig();render();toast('📂 Información importada')}
+      proyectos=d.proyectos.map(p=>({...p,direccionGeneral:p.direccionGeneral||p.direccion||'',direccionEspecifica:p.direccionEspecifica||''}));
+      if(d.config)config=d.config;guardar();guardarCfg();aplicarConfig();render();toast('📂 Información importada')}
   }catch(e){alert('⚠️ Archivo no válido. Debe ser un respaldo .json de esta aplicación.')}
   ev.target.value=''};
   r.readAsText(f);
@@ -467,9 +477,9 @@ function importarJSON(ev){
 function cargarEjemplo(){
   const t=Date.now();
   proyectos=[
-   {id:'P-001',nombre:'Bodega Los Laureles',direccion:'Av. Industrial 245, Tlaquepaque, Jal.',estatus:'En compra',encargado:'Ing. Juan Pérez',telEncargado:'33 1234 5678',autoriza:'María López (administración)',contactoCompra:'facturacion@constructoraxyz.com',compraANombreDe:'Constructora XYZ SA de CV',rfc:'CXY850101XXX',recibe:'Alberto (almacenista)',monto:185000,anticipo:'50% recibido ($92,500)',proximoPaso:'Confirmar entrega de Galvadeck',fechaContacto:'2025-07-10',observaciones:'La compra SIEMPRE sale a nombre de la empresa. Cambios de cantidad los autoriza María López por escrito.',materiales:[{material:'Zincalum',calibre:'26',color:'Natural',cantidad:120,unidad:'ml',precio:215,subtotal:25800},{material:'Polín GHT',calibre:'N/A',color:'N/A',cantidad:40,unidad:'pza',precio:480,subtotal:19200},{material:'Galvadeck',calibre:'N/A',color:'N/A',cantidad:60,unidad:'m²',precio:310,subtotal:18600}],creado:t,actualizado:t},
-   {id:'P-002',nombre:'Casa Habitación Col. Roma',direccion:'Calle Jalapa 180, Guadalajara, Jal.',estatus:'Cotización',encargado:'Arq. Sofía Ramírez',telEncargado:'33 2222 8899',autoriza:'Sofía Ramírez',contactoCompra:'sofia@correo.com',compraANombreDe:'Sofía Ramírez (persona física)',rfc:'',recibe:'El albañil en obra',monto:38550,anticipo:'Sin anticipo aún',proximoPaso:'Enviar cotización revisada',fechaContacto:'2025-07-08',observaciones:'Facturar a nombre de la arquitecta, no de los dueños.',materiales:[{material:'Coloralum',calibre:'26',color:'Rojo',cantidad:80,unidad:'ml',precio:240,subtotal:19200},{material:'Arquiteja',calibre:'26',color:'Rojo',cantidad:45,unidad:'ml',precio:350,subtotal:15750},{material:'Econoalum',calibre:'N/A',color:'N/A',cantidad:20,unidad:'pza',precio:180,subtotal:3600}],creado:t,actualizado:t},
-   {id:'P-003',nombre:'Nave Industrial El Salto',direccion:'Carretera Libre 1200, El Salto, Jal.',estatus:'Pausado',encargado:'Ing. Raúl Medina',telEncargado:'33 4444 1010',autoriza:'Gerencia El Salto',contactoCompra:'compras@nave.com',compraANombreDe:'Naves Industriales del Bajío SA de CV',rfc:'NIB090202XXX',recibe:'Por definir',monto:240000,anticipo:'Aún sin iniciar',proximoPaso:'Llamar en agosto para reactivar',fechaContacto:'2025-08-05',observaciones:'Proyecto pausado por permisos. Requiere Hierromax y Tubería GHT.',materiales:[{material:'Hierromax',calibre:'N/A',color:'N/A',cantidad:90,unidad:'pza',precio:650,subtotal:58500},{material:'Tubería GHT',calibre:'N/A',color:'N/A',cantidad:35,unidad:'pza',precio:420,subtotal:14700}],creado:t,actualizado:t}];
+   {id:'P-001',nombre:'Bodega Los Laureles',direccionGeneral:'Tlaquepaque y alrededores',direccionEspecifica:'Av. Industrial 245, Col. Industrial',estatus:'En compra',encargado:'Ing. Juan Pérez',telEncargado:'33 1234 5678',contactoCompra:'facturacion@constructoraxyz.com',compraANombreDe:'Constructora XYZ SA de CV',monto:63600,fechaContacto:'2025-07-10',observaciones:'La compra SIEMPRE sale a nombre de la empresa aunque el encargado sea Juan.',materiales:[{material:'Zincalum',calibre:'26',color:'Natural',cantidad:120,unidad:'ml',precio:215,subtotal:25800},{material:'Polín GHT',calibre:'N/A',color:'N/A',cantidad:40,unidad:'pza',precio:480,subtotal:19200},{material:'Galvadeck',calibre:'N/A',color:'N/A',cantidad:60,unidad:'m²',precio:310,subtotal:18600}],creado:t,actualizado:t},
+   {id:'P-002',nombre:'Casa Habitación Col. Roma',direccionGeneral:'Guadalajara Centro',direccionEspecifica:'Calle Jalapa 180, Col. Roma',estatus:'Cotización',encargado:'Arq. Sofía Ramírez',telEncargado:'33 2222 8899',contactoCompra:'sofia@correo.com',compraANombreDe:'Sofía Ramírez (persona física)',monto:38550,fechaContacto:'2025-07-08',observaciones:'Facturar a nombre de la arquitecta, no de los dueños.',materiales:[{material:'Coloralum',calibre:'26',color:'Rojo',cantidad:80,unidad:'ml',precio:240,subtotal:19200},{material:'Arquiteja',calibre:'26',color:'Rojo',cantidad:45,unidad:'ml',precio:350,subtotal:15750},{material:'Econoalum',calibre:'N/A',color:'N/A',cantidad:20,unidad:'pza',precio:180,subtotal:3600}],creado:t,actualizado:t},
+   {id:'P-003',nombre:'Nave Industrial El Salto',direccionGeneral:'El Salto',direccionEspecifica:'Carretera Libre 1200 km 3',estatus:'Pausado',encargado:'Ing. Raúl Medina',telEncargado:'33 4444 1010',contactoCompra:'compras@nave.com',compraANombreDe:'Naves Industriales del Bajío SA de CV',monto:73200,fechaContacto:'2025-08-05',observaciones:'Proyecto pausado por permisos. Llamar en agosto para reactivar.',materiales:[{material:'Hierromax',calibre:'N/A',color:'N/A',cantidad:90,unidad:'pza',precio:650,subtotal:58500},{material:'Tubería GHT',calibre:'N/A',color:'N/A',cantidad:35,unidad:'pza',precio:420,subtotal:14700}],creado:t,actualizado:t}];
   guardar();render();toast('✨ Datos de ejemplo cargados');
 }
 let toastTimer;
