@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Informe de Proyectos — Construcción</title>
+<style>
+:root{--navy:#0f2a43;--navy2:#1d4ed8;--amber:#f59e0b;--bg:#eef2f7;--text:#1e293b;--muted:#64748b;--line:#e2e8f0}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+button{font-family:inherit}
+header{background:linear-gradient(135deg,#0f2a43,#1e3a8a);color:#fff;padding:18px 26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+header h1{margin:0;font-size:22px}
+header p{margin:2px 0 0;font-size:13px;opacity:.85}
+.acciones-header{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--amber);color:#1e293b;border:none;padding:9px 16px;border-radius:9px;font-weight:700;font-size:13px;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.35);box-shadow:none}
+#barraInfo{display:none;background:#0f2a43;color:#cbd5e1;font-size:13px;padding:8px 26px;gap:8px;flex-wrap:wrap;border-bottom:2px solid var(--amber)}
+.toolbar{position:sticky;top:0;z-index:10;background:var(--bg);padding:14px 26px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}
+.inp{padding:9px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;background:#fff;color:var(--text)}
+.inp:focus{outline:none;border-color:var(--navy2);box-shadow:0 0 0 3px rgba(29,78,216,.15)}
+#buscador{flex:1;min-width:220px}
+#resumen{display:flex;gap:8px;flex-wrap:wrap;width:100%}
+.chip{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 14px;display:flex;flex-direction:column;min-width:110px}
+.chip .k{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+.chip .v{font-size:16px;font-weight:800;color:var(--navy)}
+.chip.mini{min-width:auto;flex-direction:row;align-items:center;gap:6px}
+.chip.mini .v{font-size:14px}
+main{padding:18px 26px 60px}
+.grupo{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(15,42,67,.08);margin-bottom:16px;overflow:hidden}
+.grupo-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;background:linear-gradient(90deg,#0f2a43,#1e3a8a);color:#fff;padding:12px 18px;cursor:pointer}
+.grupo-head .gh-total{background:var(--amber);color:#1e293b;font-weight:800;padding:3px 12px;border-radius:999px;font-size:14px}
+.grupo-head .gh-n{font-size:13px;opacity:.9;margin-right:10px}
+.chev{display:inline-block;width:16px;color:var(--amber)}
+.grupo.cerrado .grupo-body{display:none}
+.tabla-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#f8fafc;text-align:left;padding:10px 12px;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);border-bottom:2px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.fila-pro:hover td{background:#f8fafc}
+td.id{font-weight:700;color:var(--navy2);white-space:nowrap}
+td.monto{font-weight:800;color:var(--navy);white-space:nowrap}
+.mini-txt{font-size:11.5px;color:var(--muted);margin-top:2px}
+.tenue{color:#94a3b8}
+.badge{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+.b-cot{background:#e0e7ff;color:#3730a3}.b-aut{background:#dbeafe;color:#1d4ed8}
+.b-com{background:#fef3c7;color:#92400e}.b-cam{background:#ede9fe;color:#6d28d9}
+.b-ins{background:#ccfbf1;color:#0f766e}.b-cer{background:#dcfce7;color:#15803d}
+.b-pau{background:#fee2e2;color:#b91c1c}
+.compra-nombre{display:inline-block;background:#fef3c7;color:#92400e;font-weight:700;padding:2px 9px;border-radius:7px;font-size:12.5px}
+.acciones{white-space:nowrap}
+.btn-mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px}
+.btn-mini:hover{background:#f1f5f9}
+.btn-mini.peligro:hover{background:#fee2e2;border-color:#fca5a5}
+.fila-detalle td{background:#f8fafc;padding:16px 20px}
+.det-titulo{font-size:11px;text-transform:uppercase;font-weight:800;color:var(--muted);letter-spacing:.5px;margin:0 0 10px}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px;margin-bottom:14px}
+.det-grid .k{font-size:10.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
+.det-grid .v{font-size:13.5px;margin-top:2px}
+.mat-table th{background:#eef2f7}
+.vacio{text-align:center;padding:70px 20px;background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(15,42,67,.08)}
+.vacio-icon{font-size:52px}
+.modal{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;align-items:flex-start;justify-content:center;padding:28px 14px;z-index:50;overflow:auto}
+.modal.oculto{display:none}
+.modal-caja{background:#fff;border-radius:16px;max-width:980px;width:100%;padding:24px 28px;max-height:92vh;overflow:auto}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.modal-head h2{margin:0;font-size:19px;color:var(--navy)}
+.btn-x{border:none;background:#f1f5f9;border-radius:8px;font-size:16px;padding:6px 12px;cursor:pointer}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+.campo label{display:block;font-size:12px;font-weight:700;color:#475569;margin-bottom:4px}
+.campo .inp{width:100%}
+.full{grid-column:1/-1}
+.seccion{grid-column:1/-1;font-size:12px;text-transform:uppercase;font-weight:800;letter-spacing:.6px;color:var(--navy2);border-bottom:2px solid #dbeafe;padding-bottom:5px;margin-top:8px}
+textarea.inp{resize:vertical;min-height:64px}
+.tab-mat{width:100%;font-size:13px}
+.tab-mat th{padding:7px 8px}
+.tab-mat .inp{padding:7px 8px;font-size:13px}
+.celda-sub{font-weight:700;white-space:nowrap;color:var(--navy)}
+.modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}
+.suma-linea{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px;color:var(--muted);flex-wrap:wrap;gap:8px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);opacity:0;transition:.25s;background:#0f172a;color:#fff;padding:11px 20px;border-radius:10px;z-index:99;pointer-events:none;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.3)}
+#toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
+#printHeader{display:none}
+@media print{
+  @page{size:A4 landscape;margin:11mm}
+  header,.toolbar,.no-print,#barraInfo,#toast{display:none!important}
+  body{background:#fff}
+  main{padding:0}
+  #printHeader{display:block;border-bottom:3px solid #0f2a43;padding-bottom:10px;margin-bottom:14px}
+  #printHeader h1{margin:0;font-size:18px;color:#0f2a43}
+  #printHeader .meta{font-size:11.5px;color:#334155;margin-top:5px}
+  .grupo{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid-page;margin-bottom:12px}
+  .grupo.cerrado .grupo-body{display:block!important}
+  .fila-detalle{display:table-row!important}
+  .fila-detalle td{background:#f8fafc!important}
+  th:nth-child(9),td:nth-child(9){display:none}
+  tr{page-break-inside:avoid}
+  thead{display:table-header-group}
+}
+@media (max-width:700px){.form-grid{grid-template-columns:1fr}header{padding:16px}main,.toolbar{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏗️ Informe de Proyectos</h1>
+    <p>Seguimiento de materiales de construcción · Guardado automático en este navegador</p>
+  </div>
+  <div class="acciones-header">
+    <button class="btn" onclick="abrirModalProyecto()">➕ Nuevo proyecto</button>
+    <button class="btn sec" onclick="window.print()">🖨️ Imprimir / PDF</button>
+    <button class="btn sec" onclick="exportarCSV()">📊 Excel (CSV)</button>
+    <button class="btn sec" onclick="respaldarJSON()">💾 Respaldo</button>
+    <label class="btn sec">📂 Importar<input type="file" accept=".json" onchange="importarJSON(event)" hidden></label>
+    <button class="btn sec" onclick="abrirConfig()">⚙️ Datos del informe</button>
+  </div>
+</header>
+
+<div id="barraInfo"></div>
+
+<div class="toolbar no-print">
+  <input type="search" id="buscador" class="inp" placeholder="🔍 Buscar por proyecto, encargado, dirección, material..." oninput="render()">
+  <select id="filtroEstatus" class="inp" onchange="render()">
+    <option value="">Todos los estatus</option>
+    <option>Cotización</option><option>Autorizado</option><option>En compra</option>
+    <option>En camino</option><option>Instalado</option><option>Cerrado</option><option>Pausado</option>
+  </select>
+  <select id="filtroOrden" class="inp" onchange="render()">
+    <option value="contacto">Orden: próximo contacto</option>
+    <option value="monto">Orden: monto (mayor a menor)</option>
+    <option value="nombre">Orden: nombre (A–Z)</option>
+  </select>
+</div>
+
+<div id="resumen" class="toolbar no-print" style="border:none;padding-top:0"></div>
+
+<main>
+  <div id="printHeader">
+    <h1>INFORME DE PROYECTOS — SEGUIMIENTO DE MATERIALES</h1>
+    <div class="meta" id="printMeta"></div>
+    <div class="meta">Generado el <span id="printFecha"></span></div>
+  </div>
+  <div id="contenedorTabla"></div>
+</main>
+
+<!-- ══════════ MODAL PROYECTO ══════════ -->
+<div id="modal" class="modal oculto">
+  <form class="modal-caja" id="formProyecto" onsubmit="guardarProyecto(event)" autocomplete="off">
+    <div class="modal-head">
+      <h2 id="tituloModal">➕ Nuevo proyecto</h2>
+      <button type="button" class="btn-x" onclick="mostrarModal(false)">✕</button>
+    </div>
+    <div class="form-grid">
+      <div class="campo"><label>ID</label><input class="inp" id="f-id" readonly style="background:#f1f5f9;font-weight:700"></div>
+      <div class="campo"><label>Nombre del proyecto *</label><input class="inp" id="f-nombre" required placeholder="Ej. Bodega Los Laureles"></div>
+      <div class="campo"><label>Dirección / Ubicación * (agrupa la tabla)</label><input class="inp" id="f-direccion" required placeholder="Ej. Av. Industrial 245, Tlaquepaque, Jal."></div>
+      <div class="campo"><label>Estatus</label>
+        <select class="inp" id="f-estatus"><option>Cotización</option><option>Autorizado</option><option>En compra</option><option>En camino</option><option>Instalado</option><option>Cerrado</option><option>Pausado</option></select>
+      </div>
+
+      <div class="seccion">👥 Personas ligadas al proyecto</div>
+      <div class="campo"><label>Encargado del proyecto</label><input class="inp" id="f-encargado" placeholder="Ej. Ing. Juan Pérez"></div>
+      <div class="campo"><label>Teléfono del encargado</label><input class="inp" id="f-telEncargado" placeholder="Ej. 33 1234 5678"></div>
+      <div class="campo"><label>¿Quién autoriza la compra?</label><input class="inp" id="f-autoriza" placeholder="Ej. María López (administración)"></div>
+      <div class="campo"><label>Contacto de compra (tel / correo)</label><input class="inp" id="f-contactoCompra" placeholder="Ej. facturacion@empresa.com"></div>
+      <div class="campo"><label>⚠️ La compra sale a NOMBRE DE (empresa o persona) *</label><input class="inp" id="f-compraANombreDe" required placeholder="Ej. Constructora XYZ SA de CV"></div>
+      <div class="campo"><label>RFC para facturación (opcional)</label><input class="inp" id="f-rfc" placeholder="Ej. CXY850101XXX"></div>
+      <div class="campo full"><label>¿Quién recibe el material en obra?</label><input class="inp" id="f-recibe" placeholder="Ej. Alberto (almacenista)"></div>
+
+      <div class="seccion">💰 Económico y seguimiento</div>
+      <div class="campo"><label>Monto aproximado del gasto ($)</label><input type="number" step="any" min="0" class="inp" id="f-monto" placeholder="Ej. 185000"></div>
+      <div class="campo"><label>Anticipo / pagos</label><input class="inp" id="f-anticipo" placeholder="Ej. 50% recibido ($92,500)"></div>
+      <div class="campo"><label>Próximo paso</label><input class="inp" id="f-proximoPaso" placeholder="Ej. Confirmar entrega de Galvadeck"></div>
+      <div class="campo"><label>Fecha del próximo contacto</label><input type="date" class="inp" id="f-fecha"></div>
+      <div class="campo full"><label>Observaciones importantes (reglas de facturación, acuerdos, etc.)</label><textarea class="inp" id="f-observaciones" placeholder="Ej. La compra SIEMPRE sale a nombre de la empresa aunque el encargado sea otra persona..."></textarea></div>
+
+      <div class="seccion">🧱 Materiales del proyecto</div>
+      <div class="full">
+        <div class="tabla-scroll">
+          <table class="tab-mat">
+            <thead><tr><th style="width:19%">Material</th><th style="width:10%">Calibre</th><th style="width:12%">Color</th><th style="width:11%">Cantidad</th><th style="width:11%">Unidad</th><th style="width:14%">Precio unit.</th><th style="width:14%">Subtotal</th><th></th></tr></thead>
+            <tbody id="tbodyMateriales"></tbody>
+          </table>
+        </div>
+        <div class="suma-linea">
+          <button type="button" class="btn-mini" onclick="agregarMaterial()">➕ Agregar material</button>
+          <span><span id="sumaMats"></span> <button type="button" class="btn-mini" onclick="const s=calcSubtotal();if(s)$('f-monto').value=s;">↺ Usar suma como monto</button></span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button type="button" class="btn-mini" style="padding:9px 18px" onclick="mostrarModal(false)">Cancelar</button>
+      <button type="submit" class="btn">💾 Guardar proyecto</button>
+    </div>
+  </form>
+</div>
+
+<!-- ══════════ MODAL CONFIG ══════════ -->
+<div id="modalConfig" class="modal oculto">
+  <form class="modal-caja" style="max-width:560px" onsubmit="guardarConfig(event)">
+    <div class="modal-head"><h2>⚙️ Datos del informe</h2><button type="button" class="btn-x" onclick="$('modalConfig').classList.add('oculto')">✕</button></div>
+    <div class="form-grid">
+      <div class="campo full"><label>Tu nombre (responsable del seguimiento)</label><input class="inp" id="c-responsable" placeholder="Ej. Ing. Carlos Mendoza"></div>
+      <div class="campo full"><label>Tu teléfono de contacto</label><input class="inp" id="c-telefono" placeholder="Ej. 33 8765 4321"></div>
+      <div class="campo full"><label>Fechas de vacaciones</label><input class="inp" id="c-vacaciones" placeholder="Ej. del 15 al 30 de julio de 2025"></div>
+      <div class="campo full"><label>¿Quién cubre durante tu ausencia?</label><input class="inp" id="c-cubre" placeholder="Ej. Ing. Laura Gómez, tel. 33 5555 1111"></div>
+    </div>
+    <div class="modal-foot"><button type="submit" class="btn">💾 Guardar</button></div>
+  </form>
+</div>
+
+<div id="toast"></div>
+
+<script>
+/* ══════════ CATÁLOGO (edita aquí si cambian calibres o colores) ══════════ */
+const CATALOGO={
+ 'Zincalum':{calibres:['28','26','24'],colores:{'28':['Natural'],'26':['Natural'],'24':['Natural']}},
+ 'Coloralum':{calibres:['26','24'],colores:{'26':['Rojo','Azul','Verde'],'24':['Rojo']}},
+ 'Arquiteja':{calibres:['26','24'],colores:{'26':['Rojo','Verde','Azul'],'24':['Rojo']}},
+ 'Tubería GHT':{calibres:['N/A'],colores:{'N/A':['N/A']}},
+ 'Polín GHT':{calibres:['N/A'],colores:{'N/A':['N/A']}},
+ 'Hierromax':{calibres:['N/A'],colores:{'N/A':['N/A']}},
+ 'Galvadeck':{calibres:['N/A'],colores:{'N/A':['N/A']}},
+ 'Econoalum':{calibres:['N/A'],colores:{'N/A':['N/A']}}
+};
+const UNIDADES=['ml','m²','pza','kg','bulto','rollo','lote'];
+const CLASES={'Cotización':'b-cot','Autorizado':'b-aut','En compra':'b-com','En camino':'b-cam','Instalado':'b-ins','Cerrado':'b-cer','Pausado':'b-pau'};
+
+const LS_KEY='proyectosConstruccion_v1', LS_CFG='informeConfig_v1';
+let proyectos=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+let config=JSON.parse(localStorage.getItem(LS_CFG)||'null')||{responsable:'',telefono:'',vacaciones:'',cubre:''};
+let editandoId=null;
+const gruposAbiertos={};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const fmt=n=>new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN'}).format(+n||0);
+const fEs=f=>f?f.split('-').reverse().join('/'):'';
+const hoy=()=>new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});
+const guardar=()=>localStorage.setItem(LS_KEY,JSON.stringify(proyectos));
+const guardarCfg=()=>localStorage.setItem(LS_CFG,JSON.stringify(config));
+
+function siguienteId(){let m=0;proyectos.forEach(p=>{const x=/^P-(\d+)$/.exec(p.id||'');if(x)m=Math.max(m,+x[1])});return 'P-'+String(m+1).padStart(3,'0')}
+
+/* ══════════ RENDER PRINCIPAL ══════════ */
+function render(){
+  const term=($('buscador').value||'').toLowerCase().trim();
+  const fe=$('filtroEstatus').value, ord=$('filtroOrden').value;
+  let lista=proyectos.filter(p=>{
+    const okE=!fe||p.estatus===fe;
+    const blob=[p.id,p.nombre,p.direccion,p.encargado,p.compraANombreDe,p.autoriza,p.observaciones,p.proximoPaso,(p.materiales||[]).map(m=>m.material).join(' ')].join(' ').toLowerCase();
+    return okE&&(!term||blob.includes(term));
+  });
+  lista.sort({'contacto':(a,b)=>(a.fechaContacto||'9999').localeCompare(b.fechaContacto||'9999'),
+              'monto':(a,b)=>(+b.monto||0)-(+a.monto||0),
+              'nombre':(a,b)=>(a.nombre||'').localeCompare(b.nombre||'')}[ord]);
+
+  const total=lista.reduce((s,p)=>s+(+p.monto||0),0);
+  $('resumen').innerHTML=`<div class="chip"><span class="k">Proyectos visibles</span><span class="v">${lista.length}</span></div>
+    <div class="chip"><span class="k">Monto total</span><span class="v">${fmt(total)}</span></div>`+
+    ['Cotización','En compra','Cerrado','Pausado'].map(e=>{const c=lista.filter(p=>p.estatus===e).length;return c?`<div class="chip mini ${CLASES[e]}"><span class="k">${e}</span><span class="v">${c}</span></div>`:''}).join('');
+
+  $('printFecha').textContent=hoy();
+  $('printMeta').innerHTML=[config.responsable&&`👤 Responsable: ${esc(config.responsable)}`,config.telefono&&`☎️ ${esc(config.telefono)}`,config.vacaciones&&`📅 Vacaciones: ${esc(config.vacaciones)}`,config.cubre&&`🧑‍💼 Cubre durante ausencia: ${esc(config.cubre)}`].filter(Boolean).join(' &nbsp;·&nbsp; ')+`<br>Resumen: ${lista.length} proyecto(s) · Monto total: ${fmt(total)}`;
+
+  const cont=$('contenedorTabla');
+  if(!proyectos.length){cont.innerHTML=`<div class="vacio"><div class="vacio-icon">🏗️</div><h2 style="margin:8px 0 4px">Aún no hay proyectos</h2><p style="color:var(--muted)">Agrega tu primer proyecto o carga datos de ejemplo para ver cómo funciona.</p><div style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap"><button class="btn" onclick="abrirModalProyecto()">➕ Nuevo proyecto</button><button class="btn" style="background:#0f2a43;color:#fff" onclick="cargarEjemplo()">✨ Cargar datos de ejemplo</button></div></div>`;return}
+  if(!lista.length){cont.innerHTML=`<div class="vacio"><div class="vacio-icon">🔎</div><h2 style="margin:8px 0">Sin resultados</h2><p style="color:var(--muted)">Prueba con otro filtro o búsqueda.</p></div>`;return}
+
+  const grupos={};
+  lista.forEach(p=>{(grupos[(p.direccion||'').trim()||'Sin dirección especificada']??=[]).push(p)});
+  let html='';
+  for(const dir of Object.keys(grupos).sort()){
+    const items=grupos[dir], sub=items.reduce((s,p)=>s+(+p.monto||0),0), abierto=gruposAbiertos[dir]!==false;
+    html+=`<section class="grupo ${abierto?'':'cerrado'}" data-dir="${esc(dir)}">
+      <div class="grupo-head">
+        <div><span class="chev">${abierto?'▾':'▸'}</span> 📍 <strong>${esc(dir)}</strong></div>
+        <div><span class="gh-n">${items.length} proyecto${items.length>1?'s':''}</span><span class="gh-total">${fmt(sub)}</span></div>
+      </div>
+      <div class="grupo-body"><div class="tabla-scroll"><table>
+        <thead><tr><th>ID</th><th>Proyecto</th><th>Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th>Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="no-print">Acciones</th></tr></thead>
+        <tbody>${items.map(filaProyecto).join('')}</tbody>
+      </table></div></div></section>`;
+  }
+  cont.innerHTML=html;
+}
+
+function filaProyecto(p){
+  const mats=p.materiales||[], suma=mats.reduce((s,m)=>s+(+m.subtotal||0),0);
+  return `<tr class="fila-pro">
+    <td class="id">${esc(p.id)}</td>
+    <td><strong>${esc(p.nombre)}</strong>${p.proximoPaso?`<div class="mini-txt">➜ ${esc(p.proximoPaso)}</div>`:''}</td>
+    <td><span class="badge ${CLASES[p.estatus]||''}">${esc(p.estatus)}</span></td>
+    <td>${p.encargado?esc(p.encargado):'<span class="tenue">—</span>'}${p.telEncargado?`<div class="mini-txt">📞 ${esc(p.telEncargado)}</div>`:''}</td>
+    <td>${p.compraANombreDe?`<span class="compra-nombre">🧾 ${esc(p.compraANombreDe)}</span>${p.autoriza?`<div class="mini-txt">Autoriza: ${esc(p.autoriza)}</div>`:''}`:'<span class="tenue">⚠ sin definir</span>'}</td>
+    <td>${mats.length?mats.length+' mat.<div class="mini-txt">'+fmt(suma)+'</div>':'—'}</td>
+    <td class="monto">${fmt(p.monto)}</td>
+    <td>${fEs(p.fechaContacto)||'—'}</td>
+    <td class="acciones no-print">
+      <button class="btn-mini" data-action="ver" data-id="${esc(p.id)}" title="Ver detalle">👁</button>
+      <button class="btn-mini" data-action="editar" data-id="${esc(p.id)}" title="Editar">✏️</button>
+      <button class="btn-mini peligro" data-action="borrar" data-id="${esc(p.id)}" title="Eliminar">🗑</button>
+    </td>
+  </tr>
+  <tr class="fila-detalle" id="det-${esc(p.id)}" style="display:none"><td colspan="9">${detalleHTML(p)}</td></tr>`;
+}
+
+function detalleHTML(p){
+  const mats=p.materiales||[];
+  const campo=(k,v)=>`<div><div class="k">${k}</div><div class="v">${v||'<span class="tenue">—</span>'}</div></div>`;
+  return `<p class="det-titulo">📋 Detalle completo · ${esc(p.id)}</p>
+  <div class="det-grid">
+    ${campo('Encargado del proyecto',esc(p.encargado)+((p.telEncargado)?' · 📞 '+esc(p.telEncargado):''))}
+    ${campo('Autoriza la compra',esc(p.autoriza))}
+    ${campo('Contacto de compra',esc(p.contactoCompra))}
+    ${campo('⚠️ Compra a nombre de',`<span class="compra-nombre">${esc(p.compraANombreDe)}</span>`)}
+    ${campo('RFC facturación',esc(p.rfc))}
+    ${campo('Recibe material en obra',esc(p.recibe))}
+    ${campo('Monto aproximado','<strong>'+fmt(p.monto)+'</strong>')}
+    ${campo('Anticipo / pagos',esc(p.anticipo))}
+    ${campo('Próximo paso',esc(p.proximoPaso))}
+    ${campo('Fecha próximo contacto',fEs(p.fechaContacto))}
+    ${campo('Observaciones importantes',esc(p.observaciones))}
+  </div>
+  ${mats.length?`<p class="det-titulo">🧱 Materiales</p><div class="tabla-scroll"><table class="mat-table">
+    <thead><tr><th>Material</th><th>Calibre</th><th>Color</th><th>Cantidad</th><th>Unidad</th><th>Precio unit.</th><th>Subtotal</th></tr></thead>
+    <tbody>${mats.map(m=>`<tr><td><strong>${esc(m.material)}</strong></td><td>${esc(m.calibre)}</td><td>${esc(m.color)}</td><td>${esc(m.cantidad)}</td><td>${esc(m.unidad)}</td><td>${fmt(m.precio)}</td><td class="celda-sub">${fmt(m.subtotal)}</td></tr>`).join('')}
+    <tr><td colspan="6" style="text-align:right"><strong>Total materiales:</strong></td><td class="celda-sub">${fmt(mats.reduce((s,m)=>s+(+m.subtotal||0),0))}</td></tr></tbody></table></div>`:'<p class="tenue">Sin materiales registrados.</p>'}`;
+}
+
+/* ══════════ MATERIALES (formulario) ══════════ */
+function filaMaterialHTML(m={}){
+  const mats=Object.keys(CATALOGO), sel=m.material||'';
+  const cals=sel?CATALOGO[sel].calibres:[''];
+  const cols=sel&&m.calibre?(CATALOGO[sel].colores[m.calibre]||['']):[''];
+  return `<tr class="fila-mat">
+    <td><select class="inp in-mat" onchange="onMaterialChange(this)"><option value="">— Elegir —</option>${mats.map(x=>`<option ${x===sel?'selected':''}>${x}</option>`).join('')}</select></td>
+    <td><select class="inp in-cal" onchange="onCalibreChange(this)">${cals.map(c=>`<option ${c===m.calibre?'selected':''}>${c}</option>`).join('')}</select></td>
+    <td><select class="inp in-col">${cols.map(c=>`<option ${c===m.color?'selected':''}>${c}</option>`).join('')}</select></td>
+    <td><input type="number" min="0" step="any" class="inp in-cant" value="${m.cantidad??''}" oninput="calcSubtotal()" placeholder="0"></td>
+    <td><select class="inp in-uni">${UNIDADES.map(u=>`<option ${u===(m.unidad||'ml')?'selected':''}>${u}</option>`).join('')}</select></td>
+    <td><input type="number" min="0" step="any" class="inp in-precio" value="${m.precio??''}" oninput="calcSubtotal()" placeholder="0.00"></td>
+    <td class="celda-sub">$0.00</td>
+    <td><button type="button" class="btn-mini peligro" onclick="this.closest('tr').remove();calcSubtotal()">✕</button></td></tr>`;
+}
+function agregarMaterial(){$('tbodyMateriales').insertAdjacentHTML('beforeend',filaMaterialHTML())}
+function onMaterialChange(sel){
+  const tr=sel.closest('tr'), mat=sel.value;
+  const calSel=tr.querySelector('.in-cal'), colSel=tr.querySelector('.in-col');
+  if(!mat){calSel.innerHTML='<option value="">—</option>';colSel.innerHTML='<option value="">—</option>';calcSubtotal();return}
+  calSel.innerHTML=CATALOGO[mat].calibres.map(c=>`<option>${c}</option>`).join('');
+  llenarColores(tr);calcSubtotal();
+}
+function onCalibreChange(sel){llenarColores(sel.closest('tr'))}
+function llenarColores(tr){
+  const mat=tr.querySelector('.in-mat').value, cal=tr.querySelector('.in-cal').value;
+  tr.querySelector('.in-col').innerHTML=((CATALOGO[mat]||{}).colores[cal]||['—']).map(c=>`<option>${c}</option>`).join('');
+}
+function calcSubtotal(){
+  let suma=0;
+  document.querySelectorAll('#tbodyMateriales .fila-mat').forEach(tr=>{
+    const c=+tr.querySelector('.in-cant').value||0, pr=+tr.querySelector('.in-precio').value||0, sub=c*pr;
+    tr.querySelector('.celda-sub').textContent=fmt(sub);suma+=sub;
+  });
+  $('sumaMats').textContent=suma?('Σ materiales: '+fmt(suma)):'';
+  return suma;
+}
+function leerMateriales(){
+  const out=[];
+  document.querySelectorAll('#tbodyMateriales .fila-mat').forEach(tr=>{
+    const material=tr.querySelector('.in-mat').value;if(!material)return;
+    const cantidad=+tr.querySelector('.in-cant').value||0, precio=+tr.querySelector('.in-precio').value||0;
+    out.push({material,calibre:tr.querySelector('.in-cal').value,color:tr.querySelector('.in-col').value,cantidad,unidad:tr.querySelector('.in-uni').value,precio,subtotal:cantidad*precio});
+  });
+  return out;
+}
+
+/* ══════════ ALTA / EDICIÓN / BORRADO ══════════ */
+function campos(){return{
+  nombre:$('f-nombre').value.trim(),direccion:$('f-direccion').value.trim(),estatus:$('f-estatus').value,
+  encargado:$('f-encargado').value.trim(),telEncargado:$('f-telEncargado').value.trim(),
+  autoriza:$('f-autoriza').value.trim(),contactoCompra:$('f-contactoCompra').value.trim(),
+  compraANombreDe:$('f-compraANombreDe').value.trim(),rfc:$('f-rfc').value.trim(),recibe:$('f-recibe').value.trim(),
+  monto:parseFloat($('f-monto').value)||0,anticipo:$('f-anticipo').value.trim(),
+  proximoPaso:$('f-proximoPaso').value.trim(),fechaContacto:$('f-fecha').value,observaciones:$('f-observaciones').value.trim()}}
+function abrirModalProyecto(){
+  editandoId=null;$('tituloModal').textContent='➕ Nuevo proyecto';$('formProyecto').reset();
+  $('f-id').value=siguienteId();$('f-estatus').value='Cotización';
+  $('tbodyMateriales').innerHTML=filaMaterialHTML();calcSubtotal();mostrarModal(true);
+}
+function editarProyecto(id){
+  const p=proyectos.find(x=>x.id===id);if(!p)return;
+  editandoId=id;$('tituloModal').textContent='✏️ Editar proyecto '+p.id;$('formProyecto').reset();
+  $('f-id').value=p.id;$('f-nombre').value=p.nombre||'';$('f-direccion').value=p.direccion||'';$('f-estatus').value=p.estatus||'Cotización';
+  $('f-encargado').value=p.encargado||'';$('f-telEncargado').value=p.telEncargado||'';$('f-autoriza').value=p.autoriza||'';
+  $('f-contactoCompra').value=p.contactoCompra||'';$('f-compraANombreDe').value=p.compraANombreDe||'';$('f-rfc').value=p.rfc||'';
+  $('f-recibe').value=p.recibe||'';$('f-monto').value=p.monto||'';$('f-anticipo').value=p.anticipo||'';
+  $('f-proximoPaso').value=p.proximoPaso||'';$('f-fecha').value=p.fechaContacto||'';$('f-observaciones').value=p.observaciones||'';
+  $('tbodyMateriales').innerHTML=((p.materiales&&p.materiales.length)?p.materiales:[{}]).map(m=>filaMaterialHTML(m)).join('');
+  calcSubtotal();mostrarModal(true);
+}
+function guardarProyecto(e){
+  e.preventDefault();
+  const c=campos(), mats=leerMateriales();
+  if(editandoId){
+    const p=proyectos.find(x=>x.id===editandoId);
+    Object.assign(p,c,{materiales:mats,actualizado:Date.now()});
+  }else{
+    proyectos.push({id:$('f-id').value,...c,materiales:mats,creado:Date.now(),actualizado:Date.now()});
+  }
+  guardar();mostrarModal(false);render();toast('✅ Proyecto guardado');
+}
+function borrarProyecto(id){
+  const p=proyectos.find(x=>x.id===id);
+  if(confirm(`¿Eliminar el proyecto ${id} — ${p?p.nombre:''}?\nEsta acción no se puede deshacer.`)){
+    proyectos=proyectos.filter(x=>x.id!==id);guardar();render();toast('🗑 Proyecto eliminado');
+  }
+}
+function mostrarModal(v){$('modal').classList.toggle('oculto',!v)}
+function toggleDetalle(id){const el=$('det-'+id);if(el)el.style.display=el.style.display==='none'?'':'none'}
+
+ $('contenedorTabla').addEventListener('click',e=>{
+  const btn=e.target.closest('button[data-action]');
+  if(btn){const a=btn.dataset.action,id=btn.dataset.id;
+    if(a==='ver')toggleDetalle(id);if(a==='editar')editarProyecto(id);if(a==='borrar')borrarProyecto(id);return}
+  const gh=e.target.closest('.grupo-head');
+  if(gh){const k=gh.parentElement.dataset.dir;gruposAbiertos[k]=gruposAbiertos[k]===false;render()}
+});
+
+/* ══════════ CONFIG / EXPORTAR / IMPORTAR ══════════ */
+function abrirConfig(){['c-responsable','c-telefono','c-vacaciones','c-cubre'].forEach((id,i)=>$(id).value=[config.responsable,config.telefono,config.vacaciones,config.cubre][i]||'');$('modalConfig').classList.remove('oculto')}
+function guardarConfig(e){e.preventDefault();config={responsable:$('c-responsable').value.trim(),telefono:$('c-telefono').value.trim(),vacaciones:$('c-vacaciones').value.trim(),cubre:$('c-cubre').value.trim()};guardarCfg();aplicarConfig();$('modalConfig').classList.add('oculto');render();toast('⚙️ Datos del informe actualizados')}
+function aplicarConfig(){
+  const b=$('barraInfo'), parts=[config.responsable&&'👤 '+config.responsable,config.vacaciones&&'📅 Vacaciones: '+config.vacaciones,config.cubre&&'🧑‍💼 Cubre: '+config.cubre,config.telefono&&'☎️ '+config.telefono].filter(Boolean);
+  b.textContent=parts.join('   ·   ');b.style.display=parts.length?'flex':'none';
+}
+function descargar(nombre,contenido,tipo){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([contenido],{type:tipo}));a.download=nombre;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
+const csvCell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+function exportarCSV(){
+  if(!proyectos.length){toast('No hay proyectos para exportar');return}
+  const L=[['INFORME DE PROYECTOS - SEGUIMIENTO DE MATERIALES'],['Generado',hoy()]];
+  if(config.responsable)L.push(['Responsable',config.responsable]);
+  if(config.vacaciones)L.push(['Vacaciones',config.vacaciones]);
+  if(config.cubre)L.push(['Cubre durante ausencia',config.cubre]);
+  L.push([],['ID','Proyecto','Direccion','Estatus','Encargado','Tel. encargado','Autoriza compra','Contacto compra','Compra a nombre de','RFC','Recibe material','Monto aprox','Anticipo/Pagos','Proximo paso','Fecha prox. contacto','Observaciones']);
+  proyectos.forEach(p=>L.push([p.id,p.nombre,p.direccion,p.estatus,p.encargado,p.telEncargado,p.autoriza,p.contactoCompra,p.compraANombreDe,p.rfc,p.recibe,p.monto,p.anticipo,p.proximoPaso,p.fechaContacto,p.observaciones]));
+  L.push([],['DETALLE DE MATERIALES'],['ID Proyecto','Proyecto','Material','Calibre','Color','Cantidad','Unidad','Precio unitario','Subtotal']);
+  proyectos.forEach(p=>(p.materiales||[]).forEach(m=>L.push([p.id,p.nombre,m.material,m.calibre,m.color,m.cantidad,m.unidad,m.precio,m.subtotal??((+m.cantidad||0)*(+m.precio||0))])));
+  descargar('informe-proyectos.csv','\uFEFF'+L.map(r=>r.map(csvCell).join(',')).join('\r\n'),'text/csv;charset=utf-8');
+  toast('📊 CSV descargado: ábrelo con Excel');
+}
+function respaldarJSON(){descargar('respaldo-proyectos.json',JSON.stringify({config,proyectos,exportado:new Date().toISOString()},null,2),'application/json');toast('💾 Respaldo descargado')}
+function importarJSON(ev){
+  const f=ev.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{try{const d=JSON.parse(r.result);
+    if(!Array.isArray(d.proyectos))throw 0;
+    if(confirm(`Se encontraron ${d.proyectos.length} proyectos.\n¿Reemplazar la información actual?`)){
+      proyectos=d.proyectos;if(d.config)config=d.config;guardar();guardarCfg();aplicarConfig();render();toast('📂 Información importada')}
+  }catch(e){alert('⚠️ Archivo no válido. Debe ser un respaldo .json de esta aplicación.')}
+  ev.target.value=''};
+  r.readAsText(f);
+}
+
+/* ══════════ EJEMPLO / TOAST / INICIO ══════════ */
+function cargarEjemplo(){
+  const t=Date.now();
+  proyectos=[
+   {id:'P-001',nombre:'Bodega Los Laureles',direccion:'Av. Industrial 245, Tlaquepaque, Jal.',estatus:'En compra',encargado:'Ing. Juan Pérez',telEncargado:'33 1234 5678',autoriza:'María López (administración)',contactoCompra:'facturacion@constructoraxyz.com',compraANombreDe:'Constructora XYZ SA de CV',rfc:'CXY850101XXX',recibe:'Alberto (almacenista)',monto:185000,anticipo:'50% recibido ($92,500)',proximoPaso:'Confirmar entrega de Galvadeck',fechaContacto:'2025-07-10',observaciones:'La compra SIEMPRE sale a nombre de la empresa. Cambios de cantidad los autoriza María López por escrito.',materiales:[{material:'Zincalum',calibre:'26',color:'Natural',cantidad:120,unidad:'ml',precio:215,subtotal:25800},{material:'Polín GHT',calibre:'N/A',color:'N/A',cantidad:40,unidad:'pza',precio:480,subtotal:19200},{material:'Galvadeck',calibre:'N/A',color:'N/A',cantidad:60,unidad:'m²',precio:310,subtotal:18600}],creado:t,actualizado:t},
+   {id:'P-002',nombre:'Casa Habitación Col. Roma',direccion:'Calle Jalapa 180, Guadalajara, Jal.',estatus:'Cotización',encargado:'Arq. Sofía Ramírez',telEncargado:'33 2222 8899',autoriza:'Sofía Ramírez',contactoCompra:'sofia@correo.com',compraANombreDe:'Sofía Ramírez (persona física)',rfc:'',recibe:'El albañil en obra',monto:38550,anticipo:'Sin anticipo aún',proximoPaso:'Enviar cotización revisada',fechaContacto:'2025-07-08',observaciones:'Facturar a nombre de la arquitecta, no de los dueños.',materiales:[{material:'Coloralum',calibre:'26',color:'Rojo',cantidad:80,unidad:'ml',precio:240,subtotal:19200},{material:'Arquiteja',calibre:'26',color:'Rojo',cantidad:45,unidad:'ml',precio:350,subtotal:15750},{material:'Econoalum',calibre:'N/A',color:'N/A',cantidad:20,unidad:'pza',precio:180,subtotal:3600}],creado:t,actualizado:t},
+   {id:'P-003',nombre:'Nave Industrial El Salto',direccion:'Carretera Libre 1200, El Salto, Jal.',estatus:'Pausado',encargado:'Ing. Raúl Medina',telEncargado:'33 4444 1010',autoriza:'Gerencia El Salto',contactoCompra:'compras@nave.com',compraANombreDe:'Naves Industriales del Bajío SA de CV',rfc:'NIB090202XXX',recibe:'Por definir',monto:240000,anticipo:'Aún sin iniciar',proximoPaso:'Llamar en agosto para reactivar',fechaContacto:'2025-08-05',observaciones:'Proyecto pausado por permisos. Requiere Hierromax y Tubería GHT.',materiales:[{material:'Hierromax',calibre:'N/A',color:'N/A',cantidad:90,unidad:'pza',precio:650,subtotal:58500},{material:'Tubería GHT',calibre:'N/A',color:'N/A',cantidad:35,unidad:'pza',precio:420,subtotal:14700}],creado:t,actualizado:t}];
+  guardar();render();toast('✨ Datos de ejemplo cargados');
+}
+let toastTimer;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('ver');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('ver'),2600)}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('modal').classList.add('oculto');$('modalConfig').classList.add('oculto')}});
+ $('modal').addEventListener('click',e=>{if(e.target.id==='modal')mostrarModal(false)});
+ $('modalConfig').addEventListener('click',e=>{if(e.target.id==='modalConfig')$('modalConfig').classList.add('oculto')});
+
+aplicarConfig();render();
+</script>
+</body>
+</html>
