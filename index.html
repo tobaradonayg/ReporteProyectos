@@ -53,6 +53,8 @@ td.monto{font-weight:800;color:var(--navy);white-space:nowrap}
 .btn-mini{border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px 9px;cursor:pointer;font-size:13px}
 .btn-mini:hover{background:#f1f5f9}
 .btn-mini.peligro:hover{background:#fee2e2;border-color:#fca5a5}
+.mat-lista{display:none}
+.mat-line{font-size:11.5px;color:#334155}
 .fila-detalle td{background:#f8fafc;padding:12px 16px}
 .det-strip{display:flex;gap:8px 28px;flex-wrap:wrap;margin-bottom:8px}
 .det-item .k{display:block;font-size:10px;text-transform:uppercase;font-weight:800;letter-spacing:.4px;color:var(--muted)}
@@ -88,32 +90,27 @@ textarea.inp{resize:vertical;min-height:64px}
 #toast.ver{opacity:1;transform:translateX(-50%) translateY(0)}
 #printHeader{display:none}
 @media print{
-  @page{size:A4 landscape;margin:9mm}
+  @page{size:letter landscape;margin:8mm}
   header,.toolbar,.no-print,#barraInfo,#toast{display:none!important}
   body{background:#fff}
   main{padding:0}
-  #printHeader{display:block;border-bottom:2px solid #0f2a43;padding-bottom:8px;margin-bottom:10px}
-  #printHeader h1{margin:0;font-size:15px;color:#0f2a43}
-  #printHeader .meta{font-size:10px;color:#334155;margin-top:3px}
-  .grupo{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid-page;margin-bottom:8px}
+  #printHeader{display:block;border-bottom:2px solid #0f2a43;padding-bottom:6px;margin-bottom:8px}
+  #printHeader h1{margin:0;font-size:14px;color:#0f2a43}
+  #printHeader .meta{font-size:9.5px;color:#334155;margin-top:2px}
+  .grupo{box-shadow:none;border:1px solid #cbd5e1;margin-bottom:8px}
   .grupo.cerrado .grupo-body{display:block!important}
-  .grupo-head{padding:5px 12px;font-size:12px}
-  .grupo-head .gh-total{font-size:11px;padding:1px 9px}
-  .grupo-head .gh-n{font-size:10.5px}
-  th,td{padding:3px 7px;font-size:10px}
-  th{font-size:8.5px}
-  .badge{font-size:9px;padding:1px 8px}
-  .compra-nombre{font-size:9.5px;padding:1px 6px}
-  .mini-txt{font-size:9px}
-  .fila-detalle{display:table-row!important}
-  .fila-detalle td{padding:6px 10px;background:#f8fafc!important}
-  .det-item .k,.det-obs .k{font-size:8px}
-  .det-item .v{font-size:10px}
-  .det-obs{padding:4px 9px;margin-bottom:6px}
-  .det-obs .v{font-size:9.5px}
-  .mat-table{font-size:9.5px}
-  .mat-table th{font-size:8px;padding:2px 6px}
-  .mat-table td{padding:2px 6px}
+  .grupo-head{padding:4px 10px;font-size:11.5px;page-break-after:avoid;break-after:avoid}
+  .grupo-head .gh-total{font-size:10.5px;padding:1px 8px}
+  .grupo-head .gh-n{font-size:10px}
+  th,td{padding:2.5px 6px;font-size:9.5px}
+  th{font-size:8px;padding:3px 6px}
+  .mini-txt{font-size:8.5px;margin-top:1px}
+  .compra-nombre{font-size:9px;padding:1px 5px}
+  .monto{font-size:10px}
+  .mat-resumen{display:none!important}
+  .mat-lista{display:block!important}
+  .mat-line{font-size:9px;line-height:1.35}
+  .fila-detalle{display:none!important}
   .col-print-hide{display:none!important}
   tr{page-break-inside:avoid}
   thead{display:table-header-group}
@@ -178,8 +175,8 @@ textarea.inp{resize:vertical;min-height:64px}
       <div class="campo"><label>Nombre del proyecto *</label><input class="inp" id="f-nombre" required placeholder="Ej. Res. de Don William"></div>
 
       <div class="seccion">📍 Ubicación — la dirección GENERAL agrupa los proyectos en la tabla</div>
-      <div class="campo full"><label>Zona / Dirección general *</label><input class="inp" id="f-direccionGeneral" required placeholder="Ej. Quitaná y alrededores"></div>
-      <div class="campo full"><label>Dirección específica de la obra</label><input class="inp" id="f-direccionEspecifica" placeholder="Ej. Calle Jalapa 180, Col. Roma, Guadalajara, Jal."></div>
+      <div class="campo full"><label>Zona / Dirección general *</label><input class="inp" id="f-direccionGeneral" required placeholder="Ej. Aquitania y alrededores"></div>
+      <div class="campo full"><label>Dirección específica de la obra</label><input class="inp" id="f-direccionEspecifica" placeholder="Ej. Calle de la casa del interesado, sector norte"></div>
 
       <div class="seccion">👥 Personas y compras</div>
       <div class="campo"><label>Encargado del proyecto</label><input class="inp" id="f-encargado" placeholder="Ej. William"></div>
@@ -248,7 +245,6 @@ const UNIDADES=['ml','m²','pza','kg','bulto','rollo','lote'];
 const CLASES={'Cotización':'b-cot','Autorizado':'b-aut','En compra':'b-com','En camino':'b-cam','Instalado':'b-ins','Cerrado':'b-cer','Pausado':'b-pau'};
 
 const LS_KEY='proyectosConstruccion_v1', LS_CFG='informeConfig_v1';
-/* Migración automática: la "direccion" antigua pasa a ser la Zona (dirección general) */
 let proyectos=(JSON.parse(localStorage.getItem(LS_KEY)||'[]')||[]).map(p=>({...p,direccionGeneral:p.direccionGeneral||p.direccion||'',direccionEspecifica:p.direccionEspecifica||''}));
 let config=JSON.parse(localStorage.getItem(LS_CFG)||'null')||{responsable:'',telefono:'',vacaciones:'',cubre:''};
 let editandoId=null;
@@ -262,6 +258,16 @@ const guardar=()=>localStorage.setItem(LS_KEY,JSON.stringify(proyectos));
 const guardarCfg=()=>localStorage.setItem(LS_CFG,JSON.stringify(config));
 
 function siguienteId(){let m=0;proyectos.forEach(p=>{const x=/^P-(\d+)$/.exec(p.id||'');if(x)m=Math.max(m,+x[1])});return 'P-'+String(m+1).padStart(3,'0')}
+
+/* Línea compacta de material: "Coloralum · Cal. 26 · Rojo — 100 ml" */
+function matLinea(m){
+  const p=[m.material];
+  if(m.calibre&&m.calibre!=='N/A')p.push('Cal. '+m.calibre);
+  if(m.color&&m.color!=='N/A')p.push(m.color);
+  let s=p.join(' · ');
+  if(m.cantidad)s+=' — '+m.cantidad+' '+(m.unidad||'');
+  return s;
+}
 
 /* ══════════ RENDER PRINCIPAL ══════════ */
 function render(){
@@ -299,7 +305,7 @@ function render(){
         <div><span class="gh-n">${items.length} proyecto${items.length>1?'s':''}</span><span class="gh-total">${fmt(sub)}</span></div>
       </div>
       <div class="grupo-body"><div class="tabla-scroll"><table>
-        <thead><tr><th>ID</th><th>Proyecto</th><th>Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th class="col-print-hide">Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="col-print-hide no-print">Acciones</th></tr></thead>
+        <thead><tr><th>ID</th><th>Proyecto</th><th class="col-print-hide">Estatus</th><th>Encargado</th><th>⚠️ Compra a nombre de</th><th>Materiales</th><th>Monto aprox.</th><th>Próx. contacto</th><th class="col-print-hide no-print">Acciones</th></tr></thead>
         <tbody>${items.map(filaProyecto).join('')}</tbody>
       </table></div></div></section>`;
   }
@@ -311,10 +317,13 @@ function filaProyecto(p){
   return `<tr class="fila-pro">
     <td class="id">${esc(p.id)}</td>
     <td><strong>${esc(p.nombre)}</strong>${p.direccionEspecifica?`<div class="mini-txt">📌 ${esc(p.direccionEspecifica)}</div>`:''}</td>
-    <td><span class="badge ${CLASES[p.estatus]||''}">${esc(p.estatus)}</span></td>
+    <td class="col-print-hide"><span class="badge ${CLASES[p.estatus]||''}">${esc(p.estatus)}</span></td>
     <td>${p.encargado?esc(p.encargado):'<span class="tenue">—</span>'}${p.telEncargado?`<div class="mini-txt">📞 ${esc(p.telEncargado)}</div>`:''}</td>
     <td>${p.compraANombreDe?`<span class="compra-nombre">🧾 ${esc(p.compraANombreDe)}</span>`:'<span class="tenue">⚠ sin definir</span>'}</td>
-    <td class="col-print-hide">${mats.length?mats.length+' mat.<div class="mini-txt">'+fmt(suma)+'</div>':'—'}</td>
+    <td class="col-mats">
+      <span class="mat-resumen">${mats.length?mats.length+' mat. · '+fmt(suma):'—'}</span>
+      <span class="mat-lista">${mats.length?mats.map(m=>`<div class="mat-line">• ${esc(matLinea(m))}</div>`).join(''):'—'}</span>
+    </td>
     <td class="monto">${fmt(p.monto)}</td>
     <td>${fEs(p.fechaContacto)||'—'}</td>
     <td class="acciones no-print col-print-hide">
@@ -326,6 +335,7 @@ function filaProyecto(p){
   <tr class="fila-detalle" id="det-${esc(p.id)}" style="display:none"><td colspan="9">${detalleHTML(p)}</td></tr>`;
 }
 
+/* Detalle: SOLO visible en pantalla con el botón 👁 (no se imprime) */
 function detalleHTML(p){
   const mats=p.materiales||[];
   return `<div class="det-strip">
